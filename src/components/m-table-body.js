@@ -4,6 +4,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import PropTypes from 'prop-types';
 import * as React from 'react';
+import { Draggable } from 'react-beautiful-dnd';
 /* eslint-enable no-unused-vars */
 
 class MTableBody extends React.Component {
@@ -64,30 +65,37 @@ class MTableBody extends React.Component {
       }
       else {
         return (
-          <this.props.components.Row
-            components={this.props.components}
-            icons={this.props.icons}
-            data={data}
-            index={index}
-            key={"row-" + data.tableData.id}
-            level={0}
-            options={this.props.options}
-            localization={{ ...MTableBody.defaultProps.localization.editRow, ...this.props.localization.editRow }}
-            onRowSelected={this.props.onRowSelected}
-            actions={this.props.actions}
-            columns={this.props.columns}
-            getFieldValue={this.props.getFieldValue}
-            detailPanel={this.props.detailPanel}
-            path={[index + this.props.pageSize * this.props.currentPage]}
-            onToggleDetailPanel={this.props.onToggleDetailPanel}
-            onRowClick={this.props.onRowClick}
-            isTreeData={this.props.isTreeData}
-            onTreeExpandChanged={this.props.onTreeExpandChanged}
-            onEditingCanceled={this.props.onEditingCanceled}
-            onEditingApproved={this.props.onEditingApproved}
-            hasAnyEditingRow={this.props.hasAnyEditingRow}
-            treeDataMaxLevel={this.props.treeDataMaxLevel}
-          />
+          <Draggable draggableId={"draggable-" + data.tableData.id} index={index}>
+            {(provided) => {
+              <this.props.components.Row
+                components={this.props.components}
+                icons={this.props.icons}
+                data={data}
+                index={index}
+                key={"row-" + data.tableData.id}
+                level={0}
+                options={this.props.options}
+                localization={{ ...MTableBody.defaultProps.localization.editRow, ...this.props.localization.editRow }}
+                onRowSelected={this.props.onRowSelected}
+                actions={this.props.actions}
+                columns={this.props.columns}
+                getFieldValue={this.props.getFieldValue}
+                detailPanel={this.props.detailPanel}
+                path={[index + this.props.pageSize * this.props.currentPage]}
+                onToggleDetailPanel={this.props.onToggleDetailPanel}
+                onRowClick={this.props.onRowClick}
+                isTreeData={this.props.isTreeData}
+                onTreeExpandChanged={this.props.onTreeExpandChanged}
+                onEditingCanceled={this.props.onEditingCanceled}
+                onEditingApproved={this.props.onEditingApproved}
+                hasAnyEditingRow={this.props.hasAnyEditingRow}
+                treeDataMaxLevel={this.props.treeDataMaxLevel}
+                innerRef={provided.innerRef}
+                {...provided.draggableProps}
+                {...provided.dragHandleProps}
+              />
+            }}
+          </Draggable>
         );
       }
     });
@@ -134,7 +142,7 @@ class MTableBody extends React.Component {
     }
 
     return (
-      <TableBody>
+      <TableBody ref={this.props.innerRef}>
         {this.props.options.filtering &&
           <this.props.components.FilterRow
             columns={this.props.columns.filter(columnDef => !columnDef.hidden)}
@@ -192,6 +200,7 @@ class MTableBody extends React.Component {
           />
         }
         {this.renderEmpty(emptyRowCount, renderData)}
+        {this.props.droppablePlaceholder}
       </TableBody>
     );
   }

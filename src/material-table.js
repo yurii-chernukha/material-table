@@ -280,6 +280,7 @@ export default class MaterialTable extends React.Component {
   }
 
   onDragEnd = result => {
+    console.log('on drag end');
     if (!result || !result.source || !result.destination) return;
     this.dataManager.changeByDrag(result);
     this.setState(this.dataManager.getRenderState(), () => {
@@ -571,33 +572,40 @@ export default class MaterialTable extends React.Component {
           options={props.options}
         />
       }
-      <props.components.Body
-        actions={props.actions}
-        components={props.components}
-        icons={props.icons}
-        renderData={this.state.renderData}
-        currentPage={this.state.currentPage}
-        initialFormData={props.initialFormData}
-        pageSize={this.state.pageSize}
-        columns={this.state.columns}
-        detailPanel={props.detailPanel}
-        options={props.options}
-        getFieldValue={this.dataManager.getFieldValue}
-        isTreeData={this.props.parentChildData !== undefined}
-        onFilterChanged={this.onFilterChange}
-        onRowSelected={this.onRowSelected}
-        onToggleDetailPanel={this.onToggleDetailPanel}
-        onGroupExpandChanged={this.onGroupExpandChanged}
-        onTreeExpandChanged={this.onTreeExpandChanged}
-        onEditingCanceled={this.onEditingCanceled}
-        onEditingApproved={this.onEditingApproved}
-        localization={{ ...MaterialTable.defaultProps.localization.body, ...this.props.localization.body }}
-        onRowClick={this.props.onRowClick}
-        showAddRow={this.state.showAddRow}
-        hasAnyEditingRow={!!(this.state.lastEditingRow || this.state.showAddRow)}
-        hasDetailPanel={!!props.detailPanel}
-        treeDataMaxLevel={this.state.treeDataMaxLevel}
-      />
+      <Droppable droppableId={"table-body"}>
+        {(provided) => {
+          <props.components.Body
+            actions={props.actions}
+            components={props.components}
+            icons={props.icons}
+            renderData={this.state.renderData}
+            currentPage={this.state.currentPage}
+            initialFormData={props.initialFormData}
+            pageSize={this.state.pageSize}
+            columns={this.state.columns}
+            detailPanel={props.detailPanel}
+            options={props.options}
+            getFieldValue={this.dataManager.getFieldValue}
+            isTreeData={this.props.parentChildData !== undefined}
+            onFilterChanged={this.onFilterChange}
+            onRowSelected={this.onRowSelected}
+            onToggleDetailPanel={this.onToggleDetailPanel}
+            onGroupExpandChanged={this.onGroupExpandChanged}
+            onTreeExpandChanged={this.onTreeExpandChanged}
+            onEditingCanceled={this.onEditingCanceled}
+            onEditingApproved={this.onEditingApproved}
+            localization={{ ...MaterialTable.defaultProps.localization.body, ...this.props.localization.body }}
+            onRowClick={this.props.onRowClick}
+            showAddRow={this.state.showAddRow}
+            hasAnyEditingRow={!!(this.state.lastEditingRow || this.state.showAddRow)}
+            hasDetailPanel={!!props.detailPanel}
+            treeDataMaxLevel={this.state.treeDataMaxLevel}
+            innerRef={provided.innerRef}
+            droppablePlaceholder={provided.placeholder}
+            {...provided.droppableProps}
+          />
+        }}
+      </Droppable>
     </Table>
   )
 
@@ -621,7 +629,7 @@ export default class MaterialTable extends React.Component {
 
     for (let i = 0; i < Math.abs(count) && i < props.columns.length; i++) {
       const colDef = props.columns[i > 0 ? i : props.columns.length - 1 - i];
-      if(colDef.tableData) {
+      if (colDef.tableData) {
         if (typeof colDef.tableData.width === "number") {
           result.push(colDef.tableData.width + "px");
         }
@@ -636,6 +644,7 @@ export default class MaterialTable extends React.Component {
 
   render() {
     const props = this.getProps();
+    const table = this.renderTable(props);
 
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>
@@ -682,40 +691,32 @@ export default class MaterialTable extends React.Component {
             />
           }
           <ScrollBar double={props.options.doubleHorizontalScroll}>
-            <Droppable droppableId="headers" direction="horizontal">
-              {(provided, snapshot) => {
-                const table = this.renderTable(props);
-                return (
-                  <div ref={provided.innerRef}>
-                    <div ref={this.tableContainerDiv} style={{ maxHeight: props.options.maxBodyHeight, minHeight: props.options.minBodyHeight, overflowY: props.options.overflowY }}>
+            return (
+            <div>
+              <div ref={this.tableContainerDiv} style={{ maxHeight: props.options.maxBodyHeight, minHeight: props.options.minBodyHeight, overflowY: props.options.overflowY }}>
 
-                      {this.state.width && props.options.fixedColumns && props.options.fixedColumns.right ?
-                        <div style={{ width: this.getColumnsWidth(props, -1 * props.options.fixedColumns.right), position: 'absolute', top: 0, right: 0, boxShadow: '-2px 0px 15px rgba(125,147,178,.25)', overflowX: 'hidden', zIndex: 11 }}>
-                          <div style={{ width: this.state.width, background: 'white', transform: `translateX(calc(${this.getColumnsWidth(props, -1 * props.options.fixedColumns.right)} - 100%))` }}>
-                            {table}
-                          </div>
-                        </div> : null
-                      }
-
-                      <div  >
-                        {table}
-                      </div>
-
-                      {this.state.width && props.options.fixedColumns && props.options.fixedColumns.left ?
-                        <div style={{ width: this.getColumnsWidth(props, props.options.fixedColumns.left), position: 'absolute', top: 0, left: 0, boxShadow: '2px 0px 15px rgba(125,147,178,.25)', overflowX: 'hidden', zIndex: 11 }}>
-                          <div style={{ width: this.state.width, background: 'white' }}>
-                            {table}
-                          </div>
-                        </div> : null
-                      }
-
+                {this.state.width && props.options.fixedColumns && props.options.fixedColumns.right ?
+                  <div style={{ width: this.getColumnsWidth(props, -1 * props.options.fixedColumns.right), position: 'absolute', top: 0, right: 0, boxShadow: '-2px 0px 15px rgba(125,147,178,.25)', overflowX: 'hidden', zIndex: 11 }}>
+                    <div style={{ width: this.state.width, background: 'white', transform: `translateX(calc(${this.getColumnsWidth(props, -1 * props.options.fixedColumns.right)} - 100%))` }}>
+                      {table}
                     </div>
-                    {provided.placeholder}
-                  </div>
-                );
-              }}
-            </Droppable>
+                  </div> : null
+                }
 
+                <div  >
+                  {table}
+                </div>
+
+                {this.state.width && props.options.fixedColumns && props.options.fixedColumns.left ?
+                  <div style={{ width: this.getColumnsWidth(props, props.options.fixedColumns.left), position: 'absolute', top: 0, left: 0, boxShadow: '2px 0px 15px rgba(125,147,178,.25)', overflowX: 'hidden', zIndex: 11 }}>
+                    <div style={{ width: this.state.width, background: 'white' }}>
+                      {table}
+                    </div>
+                  </div> : null
+                }
+
+              </div>
+            </div>
           </ScrollBar>
           {(this.state.isLoading || props.isLoading) && props.options.loadingType === "linear" &&
             <div style={{ position: 'relative', width: '100%' }}>

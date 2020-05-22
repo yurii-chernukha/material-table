@@ -7,7 +7,6 @@ import TableCell from '@material-ui/core/TableCell';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import withStyles from '@material-ui/core/styles/withStyles';
-import { Droppable, Draggable } from 'react-beautiful-dnd';
 import { Tooltip } from '@material-ui/core';
 import * as CommonValues from '../utils/common-values';
 /* eslint-enable no-unused-vars */
@@ -21,25 +20,6 @@ export class MTableHeader extends React.Component {
       .sort((a, b) => a.tableData.columnOrder - b.tableData.columnOrder)
       .map((columnDef, index) => {
         let content = columnDef.title;
-
-        if (this.props.draggable) {
-          content = (
-            <Draggable
-              key={columnDef.tableData.id}
-              draggableId={columnDef.tableData.id.toString()}
-              index={index}>
-              {(provided, snapshot) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.draggableProps}
-                  {...provided.dragHandleProps}
-                >
-                  {columnDef.title}
-                </div>
-              )}
-            </Draggable>
-          );
-        }
 
         if (columnDef.sorting !== false && this.props.sorting) {
           content = (
@@ -199,7 +179,6 @@ MTableHeader.defaultProps = {
   orderDirection: 'asc',
   actionsHeaderIndex: 0,
   detailPanelColumnAlignment: "left",
-  draggable: true,
   thirdSortClick: true,
 };
 
@@ -220,7 +199,6 @@ MTableHeader.propTypes = {
   actionsHeaderIndex: PropTypes.number,
   showActionsColumn: PropTypes.bool,
   showSelectAllCheckbox: PropTypes.bool,
-  draggable: PropTypes.bool,
   thirdSortClick: PropTypes.bool,
   tooltip: PropTypes.string
 };

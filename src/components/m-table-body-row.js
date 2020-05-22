@@ -264,6 +264,7 @@ export default class MTableBodyRow extends React.Component {
       treeDataMaxLevel,
       localization,
       actions,
+      innerRef,
       ...rowProps } = this.props;
 
     return (
@@ -273,6 +274,7 @@ export default class MTableBodyRow extends React.Component {
           {...rowProps}
           hover={onRowClick ? true : false}
           style={this.getStyle(this.props.index, this.props.level)}
+          ref={innerRef}
           onClick={(event) => {
             onRowClick && onRowClick(event, this.props.data,
               (panelIndex) => {
